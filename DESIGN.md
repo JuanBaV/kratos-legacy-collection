@@ -6,8 +6,8 @@ A Windows game library for owners of the Greek saga, expressed as an eroded ston
 
 - Charcoal (#141414) and bone (#F1E9DB) keep the library legible; bronze (#C1A06B) establishes navigation; red (#B53932) identifies the primary action.
 - Georgia headings evoke carved inscriptions using a Windows system font. Segoe UI keeps controls and diagnostic text readable.
-- A narrow navigation rail leaves space for five individual games. A larger detail area explains the selected game's requirements and enhancements.
-- Cards represent actual independent games. Their geometric temple motifs and Roman chapter numbers distinguish entries without copyrighted covers.
+- A narrow navigation rail leaves space for six individual games. A larger detail area explains the selected game's requirements and enhancements.
+- Cards represent actual independent games. At the owner's request, their placeholders contain only I, II, Chains of Olympus, Ghost of Sparta, III or Ascension. User-supplied artwork replaces this text. Architectural geometry is limited to setup and About.
 - Square edges and a repeated stepped meander border reference Greek masonry. No glass panels or decorative status statistics.
 - A short opening fade and selection highlight explain context changes. A small ember field is optional and disabled by reduced motion.
 - Setup uses the owner's exact WELCOME, GET STARTED, SETUP COMPLETE and ENTER THE PANTHEON text. This explicit copy overrides Antislop's generic CTA default rule.
