@@ -1,6 +1,6 @@
 # Local release candidate report
 
-Date: 2026-10-27. Version: 0.1.0. This is a working Windows desktop application and a local release candidate. Public publication and physical removable-drive acceptance remain separate steps.
+Date: 2026-10-27. Version: 0.1.0. This is a working Windows desktop application and a local release candidate. Public publication and remaining hardware acceptance remain separate steps.
 
 ## Architecture and technology
 
@@ -28,7 +28,7 @@ Storage uses atomic JSON replacement with a preceding settings backup. Managed p
 
 ## Emulator and personal collection verification
 
-PCSX2 2.6.3 and PPSSPP 1.20.4 were found locally. Private SSD settings reference four verified PS2/PSP images in their original locations. Existing texture directories and graphics/controller files remain there. They are not falsely registered as launcher-installed mods.
+PCSX2 2.6.3 and PPSSPP 1.20.4 were found locally. The initial private SSD settings referenced four verified PS2/PSP images in their original locations and reused the existing texture directories and graphics/controller files. These packs were not falsely registered as launcher-installed mods.
 
 Using isolated copies and the launch service, God of War (2005), Chains of Olympus and Ghost of Sparta reached their main menus. God of War II reached its initial display confirmation. The owner assisted with startup menus. This is boot evidence, not a full gameplay, controller or performance certification. The original PCSX2 INI and PPSSPP system/controller INI hashes remained unchanged.
 
@@ -36,7 +36,9 @@ A second, small PPSSPP copy tested a 2x temporary profile. Chains of Olympus rea
 
 Completed emulator test copies and helper builds were deleted. The full PPSSPP and PCSX2 clones alone recovered approximately 15.46 GB. Original games, saves, configurations, BIOS and texture directories were preserved. Private settings and extracted artwork remain outside the public repository.
 
-The owner subsequently authorized physical migration to removable storage. Copying, individual SHA-256 transfer verification, portable configuration, preservation checks and a file audit completed. The real USB launcher then booted all four PS2/PSP titles to their main menus through their separate PLAY controls and copied emulators. Native texture-replacement settings were retained; modified menus were visible in both PSP titles and God of War II. Twenty-six copied saves, memory cards and save states still matched their transfer hashes after the tests. Original PC installations and collection files remain in place. Existing PS3 disc content and an unrelated movie remain outside the application folder and repository.
+The owner subsequently authorized physical migration to removable storage. Copying, individual SHA-256 transfer verification, portable configuration, preservation checks and a file audit completed. The real USB launcher then booted all four PS2/PSP titles to their main menus through their separate PLAY controls and copied emulators. Native texture-replacement settings were retained; modified menus were visible in both PSP titles and God of War II. Twenty-six copied saves, memory cards and save states still matched their transfer hashes after the tests. Original PC installations and collection files were retained for owner acceptance. Existing PS3 disc content and an unrelated movie remain outside the application folder and repository.
+
+After explicit owner acceptance, a private file-level cleanup removed the four source images, their identified texture packs, game-specific data, redundant artwork and generated diagnostic dumps. Fresh SHA-256 comparisons verified USB counterparts for every valuable selected file before deletion. All installed PC emulators, active RPCS3 dependencies, shared BIOS and memory cards, global settings and unrelated games were retained. God of War (2005) and Ghost of Sparta then reached their menus again through the USB launcher with the PC game copies absent. Ghost of Sparta's modified texture-pack menu remained visible. All 26 portable save/card/state hashes still matched afterward. This cleanup is a private maintenance operation, not an automatic launcher feature.
 
 God of War III BCES00510 was launched from its existing removable-drive folder using the owner's PC RPCS3 0.0.43 installation. The matching owner-provided European update was installed first; metadata and the boot log confirmed 01.03. The native custom configuration was loaded. After changing its exclusive-fullscreen option to Disable, a new boot reached the main menu with owner assistance. No global Windows HDR setting was changed. The game was closed after the boot check; prolonged gameplay and performance have not been certified. Details and limits are recorded in [Testing](TESTING.md).
 
@@ -64,7 +66,7 @@ On Windows with the .NET 10 SDK:
 ./artifacts/portable-win-x64/KratosLegacyCollection.exe
 ```
 
-Keep the complete published folder together. A clean copy opens setup. The owner's separate local shortcut supplies a private collection root; private paths are never part of public defaults. See the [README](../README.md) for manual build commands and data-location behavior.
+Keep the complete published folder together. A clean copy opens setup. The owner's separate local shortcut points to the private removable-drive collection; private paths are never part of public defaults. See the [README](../README.md) for manual build commands and data-location behavior.
 
 The local repository uses branch `main`. The owner added a GitHub remote; the development workflow has performed no push or public release. Incremental commits include:
 
