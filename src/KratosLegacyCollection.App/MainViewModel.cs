@@ -243,6 +243,7 @@ public sealed class MainViewModel : Observable
             {
                 Changed(nameof(Renderers));
                 Changed(nameof(ShowRenderer));
+                Changed(nameof(ShowAspect));
                 RefreshMods();
             }
         }
@@ -373,6 +374,7 @@ public sealed class MainViewModel : Observable
     public string ModPage { get; set; } = "";
     public IReadOnlyList<string> Presets { get; } = ["ORIGINAL", "ENHANCED", "ULTRA HD", "CUSTOM"];
     public bool ShowRenderer => Selected?.Definition.Emulator != EmulatorKind.PCSX2;
+    public bool ShowAspect => Selected?.Definition.Emulator == EmulatorKind.PCSX2;
     public IReadOnlyList<string> Renderers => Selected?.Definition.Emulator == EmulatorKind.RPCS3
         ? ["Default", "Vulkan", "OpenGL"] : ["Default", "Vulkan", "Direct3D 11", "OpenGL"];
     public ICommand Navigate

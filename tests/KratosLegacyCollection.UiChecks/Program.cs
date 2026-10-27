@@ -80,9 +80,9 @@ internal static class Program
             Invoke(vm.Next);
             Check("Empty library opens independently", !vm.SetupVisible && vm.Games.Count == 6 && vm.CollectionSummary == "0 OF 6 READY");
             var selectedGame = vm.Selected;
-            Check("PCSX2 hides unsupported renderer options", !vm.ShowRenderer);
+            Check("PCSX2 shows only applicable graphics controls", !vm.ShowRenderer && vm.ShowAspect);
             vm.Selected = vm.Games.Single(g => g.Definition.Key == "gow3");
-            Check("RPCS3 renderer list contains only supported backends", vm.ShowRenderer && !vm.Renderers.Contains("Direct3D 11"));
+            Check("RPCS3 renderer list and aspect controls match supported settings", vm.ShowRenderer && !vm.ShowAspect && !vm.Renderers.Contains("Direct3D 11"));
             vm.Selected = selectedGame;
             Invoke(vm.SortChronologically);
             Check("Chronological sort preserves selection and game settings", vm.Games.Select(g => g.Definition.Key).SequenceEqual(new[] { "ascension", "chains", "gow1", "ghost", "gow2", "gow3" }) && ReferenceEquals(vm.Selected, selectedGame));
