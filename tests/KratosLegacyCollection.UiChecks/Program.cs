@@ -104,12 +104,30 @@ internal static class Program
                 var scroll = Descendants<ScrollViewer>(window).First(s => s.IsVisible);
                 Check("No horizontal content overflow at " + size.Item1, scroll.ExtentWidth <= scroll.ViewportWidth + 1);
             }
+            var cards = (ListBox)window.FindName("GameCards");
+            var libraryScroll = Descendants<ScrollViewer>(window).First(s => s.IsVisible);
+            libraryScroll.ScrollToTop();
+            Pump();
+            var cardSurface = Descendants<Border>(cards).First(b => b.DataContext is GameViewModel);
+            cardSurface.RaiseEvent(new MouseWheelEventArgs(Mouse.PrimaryDevice, Environment.TickCount, -120) { RoutedEvent = Mouse.MouseWheelEvent });
+            Pump();
+            Check("Game card wheel input scrolls the library viewport", libraryScroll.VerticalOffset > 0);
+            cards.IsEnabled = false;
+            Pump();
+            var disabledCards = new RenderTargetBitmap((int)cards.ActualWidth, (int)cards.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            disabledCards.Render(cards);
+            var disabledPixel = new byte[4];
+            disabledCards.CopyPixels(new Int32Rect((int)cards.ActualWidth - 3, 3, 1, 1), disabledPixel, 4, 0);
+            Check("Busy game library retains its dark or transparent background", disabledPixel[3] == 0 || disabledPixel.Take(3).Max() < 80);
+            cards.IsEnabled = true;
+            libraryScroll.ScrollToTop();
+            Pump();
             foreach (var game in vm.Games)
             {
                 vm.Selected = game;
                 Check("Independent empty status " + game.Name, game.Status == "GAME FILES REQUIRED");
                 Invoke(vm.Play);
-                Check("Missing game produces visible English error", vm.HasError && vm.Message.Contains("not ready"));
+                Check("Missing game produces visible English error for " + game.Name, vm.HasError && vm.Message.Contains("not ready"));
             }
             var artworkPages = new Dictionary<string, string> { ["gow1"] = "36454", ["gow2"] = "35531", ["chains"] = "36385", ["ghost"] = "4561", ["gow3"] = "38217", ["ascension"] = "5248417" };
             foreach (var game in vm.Games)

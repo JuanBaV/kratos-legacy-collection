@@ -2,6 +2,8 @@
 
 Derived from the owner's specification. ENERGY 3 / RHYTHM 2 / MOTION 2.
 
+The owner-requested "By Lentejuelon" credit sits below the application title. The original application icon is a circular bronze Spartan shield with a red lambda, built from editable vector paths. Its broad rim and simple center remain readable in the Windows title bar and taskbar; no official game logo is used.
+
 A Windows game library for owners of the Greek saga, expressed as an eroded stone archive with bronze inscriptions and a restrained blood-red action color. The interface uses original vector architecture, never game artwork or official logos.
 
 - Charcoal (#141414) and bone (#F1E9DB) keep the library legible; bronze (#C1A06B) establishes navigation; red (#B53932) identifies the primary action.

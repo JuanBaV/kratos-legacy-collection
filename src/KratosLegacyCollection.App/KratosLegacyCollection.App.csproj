@@ -8,7 +8,9 @@
     <Title>Kratos Legacy Collection</Title>
     <Description>Desktop launcher for user-provided Greek saga games.</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/kratos-legacy.ico</ApplicationIcon>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <ItemGroup><ProjectReference Include="../KratosLegacyCollection.Core/KratosLegacyCollection.Core.csproj" /></ItemGroup>
+  <ItemGroup><Resource Include="Assets/kratos-legacy.ico" /></ItemGroup>
 </Project>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>Original Spartan shield icon for Kratos Legacy Collection</title>
+  <path fill="#362A1D" d="M128 6 A122 122 0 1 1 128 250 A122 122 0 1 1 128 6Z"/>
+  <path fill="#C1A06B" d="M128 12 A116 116 0 1 1 128 244 A116 116 0 1 1 128 12Z"/>
+  <path fill="#E2C18A" d="M128 17 A111 111 0 0 0 22 159 A115 115 0 0 1 159 22 A111 111 0 0 0 128 17Z"/>
+  <path fill="#695035" d="M128 29 A99 99 0 1 1 128 227 A99 99 0 1 1 128 29Z"/>
+  <path fill="#24201C" d="M128 36 A92 92 0 1 1 128 220 A92 92 0 1 1 128 36Z"/>
+  <path fill="#352A22" d="M128 41 A87 87 0 0 0 49 164 L128 70 L207 164 A87 87 0 0 0 128 41Z"/>
+  <path fill="#B53932" d="M128 60 L190 184 L159 184 L128 119 L97 184 L66 184Z"/>
+  <path fill="#D16249" d="M128 60 L132 83 L83 184 L66 184Z"/>
+</svg>

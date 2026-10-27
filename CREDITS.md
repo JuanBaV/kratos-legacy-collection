@@ -6,6 +6,7 @@
 - Modder Espartano: [creator channel](https://www.youtube.com/@modderespartano). The [Discord invitation](https://discord.com/invite/dmgWJtZDsB) is linked in the creator's [original publication](https://www.youtube.com/watch?v=0wsqJFCK15Y), verified on 2026-10-27. No pack or redistribution permission is implied by this credit.
 - Other texture and patch authors retain all rights to their own contributions. The importer records author credit supplied by the user.
 - Original geometric temple illustrations: Kratos Legacy Collection contributors, MIT.
+- Original bronze Spartan shield and red lambda application icon: Kratos Legacy Collection contributors, MIT. Editable SVG and multi-size ICO sources are included.
 - Georgia, Segoe UI and Consolas: Windows system fonts; no font files are included.
 - .NET runtime: Microsoft and contributors. Preserve the runtime license and third-party notices in self-contained builds.
 

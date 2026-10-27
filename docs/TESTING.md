@@ -6,7 +6,7 @@ The core suite uses generated ISO9660 directories, PARAM.SFO records, tiny PNGs,
 
 WPF checks instantiate the real application resources and window on an STA dispatcher, exercise view-model command routes, render the interface at 900x650, 1280x860 and 1600x900, inspect binding diagnostics and validate logical focus. File dialogs, external browser launches and confirmation answers are injected test boundaries. These checks are not a claim that every native Windows dialog was manually clicked.
 
-The latest local run on 2026-10-27 passed 50/50 core cases and 78 distinct WPF assertions, excluding repeated command-availability checks. Release compilation completed with zero warnings and zero errors. The self-contained Windows x64 folder was published locally; no GitHub workflow was run remotely.
+The latest local run on 2026-10-27 passed 50/50 core cases and 80 distinct WPF assertions, excluding repeated command-availability checks. Release compilation completed with zero warnings and zero errors. The self-contained Windows x64 folder was published locally; no GitHub workflow was run remotely.
 
 ## Acceptance matrix
 
@@ -34,6 +34,7 @@ The latest local run on 2026-10-27 passed 50/50 core cases and 78 distinct WPF a
 | English UI | Application copy and validation messages are English; binding routes exercised. | User filenames and third-party emulator UI retain their own language. |
 | Artwork | Embedded PSP/PS3 extraction, PNG/JPEG safety limits, real WPF image decoding and manual import. | Review source rights before publishing user images. |
 | Sorting | Exact requested chronological and release sequences, selection preservation and saved preference. | Click the two library controls in the packaged build. |
+| Library wheel and loading state | Wheel input over a real card scrolls the outer viewport; a disabled-card render retains a dark or transparent background. | Confirm wheel scrolling and loading appearance in the native package. |
 
 ## Private integration checks
 
@@ -49,4 +50,10 @@ God of War III (BCES00510) booted from its existing removable-drive disc folder 
 
 At the owner's request, only the custom profile's Vulkan `Exclusive Fullscreen Mode` was changed from `Automatic` to `Disable` before restarting. The next boot log confirmed that value and `VK_FULL_SCREEN_EXCLUSIVE_DISALLOWED_EXT`. Windows HDR settings were not changed. Controller configuration was performed by the owner afterward and is not an automated test result.
 
-The copy and verification of the PS2/PSP collection to removable storage is in progress. Its final launch checks, physical drive-letter changes, another PC and extended gameplay remain acceptance items. Ascension has no user-provided game files and has not been booted. No public screenshot or test fixture includes personal or commercial game content.
+The owner-authorized copy and file audit to removable storage completed. PCSX2 and PPSSPP use copied executables, local data folders, user-provided BIOS where needed, saves and existing texture replacements. The existing PC RPCS3 remains external. All original PC emulator installations and collection files were retained. The pre-existing USB disc/movie inventory passed size/timestamp checks; critical disc metadata and boot files also passed SHA-256 checks. This was not a full re-hash of the existing movie or disc folder.
+
+The real USB launcher displayed five ready titles and started God of War (2005), God of War II, Chains of Olympus and Ghost of Sparta through their individual PLAY controls. All four reached their main menus using the USB emulator copies. Modified texture-pack menus were visible in both PSP games and God of War II. Twenty-six copied save, memory-card and save-state files still matched their transfer hashes after these tests, as did their original source files. This verifies menu boot and preservation, not full gameplay, controller calibration or every texture replacement.
+
+An actual native wheel-scrolling failure and light background during loading were reproduced with WPF checks before replacing the library's redundant inner scrolling template. Both focused checks then passed. The header includes the owner-requested credit and an original seven-size Spartan shield icon, decoded by the asset generator.
+
+Physical drive-letter changes, another PC, controller acceptance and extended gameplay remain manual items. Ascension has no user-provided game files and has not been booted. No public screenshot or test fixture includes personal or commercial game content.

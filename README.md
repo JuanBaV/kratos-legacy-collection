@@ -59,6 +59,8 @@ dotnet publish src/KratosLegacyCollection.App -c Release -r win-x64 --self-conta
 
 Publishing may need NuGet access for Microsoft's runtime packs. Close the running development build before rebuilding its output folder. The test suite creates legal generated fixtures under `artifacts/test-runs`, returns a nonzero exit code on failure and never requires commercial games. Use `./scripts/Build.ps1 -Publish` to run the full sequence and copy the project's license, README, credits and the matching Microsoft runtime license notices into the distributable folder. Keep those notices with any shared build.
 
+The original Spartan shield icon is included as editable SVG and a seven-size ICO. After editing the SVG, regenerate the ICO on Windows with `powershell.exe -NoProfile -STA -File scripts/Build-Icon.ps1`, then rebuild. The generator uses WPF and adds no application dependency.
+
 ## Documentation
 
 - [Architecture and implementation](docs/IMPLEMENTATION.md)

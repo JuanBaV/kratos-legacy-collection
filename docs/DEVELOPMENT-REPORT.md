@@ -36,7 +36,7 @@ A second, small PPSSPP copy tested a 2x temporary profile. Chains of Olympus rea
 
 Completed emulator test copies and helper builds were deleted. The full PPSSPP and PCSX2 clones alone recovered approximately 15.46 GB. Original games, saves, configurations, BIOS and texture directories were preserved. Private settings and extracted artwork remain outside the public repository.
 
-The owner subsequently authorized physical migration to removable storage. Copying and individual SHA-256 verification of the PS2/PSP games, portable emulator copies and their existing data is in progress. Original PC installations and collection files remain in place. Existing PS3 disc content and an unrelated movie remain outside the application folder and repository.
+The owner subsequently authorized physical migration to removable storage. Copying, individual SHA-256 transfer verification, portable configuration, preservation checks and a file audit completed. The real USB launcher then booted all four PS2/PSP titles to their main menus through their separate PLAY controls and copied emulators. Native texture-replacement settings were retained; modified menus were visible in both PSP titles and God of War II. Twenty-six copied saves, memory cards and save states still matched their transfer hashes after the tests. Original PC installations and collection files remain in place. Existing PS3 disc content and an unrelated movie remain outside the application folder and repository.
 
 God of War III BCES00510 was launched from its existing removable-drive folder using the owner's PC RPCS3 0.0.43 installation. The matching owner-provided European update was installed first; metadata and the boot log confirmed 01.03. The native custom configuration was loaded. After changing its exclusive-fullscreen option to Disable, a new boot reached the main menu with owner assistance. No global Windows HDR setting was changed. The game was closed after the boot check; prolonged gameplay and performance have not been certified. Details and limits are recorded in [Testing](TESTING.md).
 
@@ -44,14 +44,14 @@ God of War III BCES00510 was launched from its existing removable-drive folder u
 
 - Release build: success, zero warnings and zero errors.
 - Core regression suite: 50/50 cases passed using legal generated fixtures, including collection-relative and removable-volume drive changes.
-- WPF suite: 78 distinct assertions passed; repeated command-availability assertions are excluded from this count. Three rendered sizes, navigation and command routes, binding diagnostics, sorting and artwork decoding were checked.
+- WPF suite: 80 distinct assertions passed; repeated command-availability assertions are excluded from this count. Three rendered sizes, navigation and command routes, binding diagnostics, sorting, artwork decoding, library wheel routing and the loading-state background were checked.
 - Self-contained package: started natively; welcome, five-step setup, empty library, sorting and native executable-picker opening/cancellation were exercised. Duplicate collection opening produces an English error.
 - Native dialogs and external services are injected boundaries in automated tests; no claim is made that every OS dialog or third-party emulator feature was manually exercised.
 - [UI delivery gate](UI-VERIFICATION.md) records presentation evidence. [Testing](TESTING.md) distinguishes automated coverage from remaining hardware and real-game checks.
 
 ## Remaining acceptance and limits
 
-Ascension boot, full gameplay, actual performance, controller acceptance, per-monitor DPI changes, another PC and physical USB disconnection/reconnection remain manual acceptance items. The ongoing PS2/PSP transfer still requires final verification and launch checks. The launcher does not promise Ultra HD performance on arbitrary hardware.
+Ascension boot, full gameplay, actual performance, controller acceptance, per-monitor DPI changes, another PC and physical USB disconnection/reconnection remain manual acceptance items. The launcher does not promise Ultra HD performance on arbitrary hardware.
 
 No authorized Modder Espartano archive was obtained or inspected. The creator channel, original God of War II publication and public Discord invitation were verified, but exact pack versions, regions, archive layouts and redistribution permissions remain unestablished. No invented package catalog or unverified patch code is shipped. 7Z extraction is not implemented; ZIP is explicitly supported. Native game widescreen and output stretching are distinguished.
 

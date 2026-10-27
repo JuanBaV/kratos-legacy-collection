@@ -2,7 +2,7 @@
 
 Result: PASS for the local launcher candidate, 2026-10-27. Scope is the launcher; third-party emulator internals and the manual hardware checks in TESTING.md are not certified here.
 
-Evidence: Release compilation; 78 distinct STA WPF assertions; generated-content core cases; actual renders at 900x650, 1280x860 and 1600x900; native packaged welcome/setup/empty-library/sorting and executable-picker opening/cancellation. Automated OS-dialog answers are injected, as explained in TESTING.md. This report does not claim a manual click on every native dialog or full game compatibility.
+Evidence: Release compilation; 80 distinct STA WPF assertions; generated-content core cases; actual renders at 900x650, 1280x860 and 1600x900; native packaged welcome/setup/empty-library/sorting and executable-picker opening/cancellation. Automated OS-dialog answers are injected, as explained in TESTING.md. This report does not claim a manual click on every native dialog or full game compatibility.
 
 ## Hard gate
 
@@ -55,3 +55,11 @@ Evidence: Release compilation; 78 distinct STA WPF assertions; generated-content
 - R-16 PASS: removed the owner-rejected marketing slogans; no AI marketing buzzwords are present.
 - R-21/R-29 PASS: dark stone, bronze and restrained red follow the owner's supplied palette; neutrals carry most of the screen.
 - R-30 PASS: no official game UI, protected logo or unrelated commercial product layout was cloned.
+
+## Library and identity follow-up, 2026-10-27
+
+- R-03/R-32 PASS: the wheel regression failed before the fix, then passed after removing the library's redundant inner scrolling template. Native wheel input over a game card also moved the USB application's viewport. All three updated renders were visually reviewed.
+- R-27/R-35 PASS: the disabled-library pixel check retains a dark or transparent background; Release build, 50 core cases and 80 uniquely named WPF assertions passed. Four actual PLAY controls in the USB package booted their individual PS2/PSP games to their menus.
+- R-23/R-30 PASS: the owner explicitly requested the author credit and a Spartan shield. The SVG is original geometric work; its seven generated ICO sizes decode successfully. No official game logo or character image is embedded in the executable.
+- R-25/C-4 PASS: "By Lentejuelon" uses the existing muted text brush beneath the title, with adequate header height at all three tested sizes. The running USB application showed the credit and shield title-bar icon together with five ready entries.
+- C-5 PASS: real menu boots, source/save hash preservation and generated-fixture checks are identified separately from pending full gameplay, controller and cross-PC acceptance. Public renders still contain only original placeholders and generated data.
