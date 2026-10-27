@@ -18,19 +18,32 @@ public sealed class CollectionPaths
     public string Store(string absolute)
     {
         var full = System.IO.Path.GetFullPath(absolute);
-        return IsWithin(Root, full) ? "./" + System.IO.Path.GetRelativePath(Root, full).Replace('\\', '/') : full;
+        if (IsWithin(Root, full))
+            return "./" + System.IO.Path.GetRelativePath(Root, full).Replace('\\', '/');
+        var volume = System.IO.Path.GetPathRoot(Root)!;
+        if (IsWithin(volume, full) && new DriveInfo(volume).DriveType == DriveType.Removable)
+            return "@volume/" + System.IO.Path.GetRelativePath(volume, full).Replace('\\', '/');
+        return full;
     }
     public string Resolve(string stored)
     {
         if (stored.StartsWith("./", StringComparison.Ordinal))
             return SafeCombine(Root, stored[2..]);
+        if (stored.StartsWith("@volume/", StringComparison.Ordinal))
+        {
+            if (stored[8..].Replace('\\', '/').Split('/').Any(part => part is "." or ".."))
+                throw new UserError("The stored volume path is invalid.");
+            return SafeCombine(System.IO.Path.GetPathRoot(Root)!, stored[8..]);
+        }
         if (!System.IO.Path.IsPathFullyQualified(stored))
             throw new UserError("The stored path is invalid. Select the file again.");
         return System.IO.Path.GetFullPath(stored);
     }
     public static bool IsWithin(string root, string path)
     {
-        var prefix = System.IO.Path.TrimEndingDirectorySeparator(System.IO.Path.GetFullPath(root)) + System.IO.Path.DirectorySeparatorChar;
+        var prefix = System.IO.Path.GetFullPath(root);
+        if (!System.IO.Path.EndsInDirectorySeparator(prefix))
+            prefix += System.IO.Path.DirectorySeparatorChar;
         return System.IO.Path.GetFullPath(path).StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
     }
     public static string SafeCombine(string root, string relative)

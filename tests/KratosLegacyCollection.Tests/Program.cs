@@ -214,6 +214,20 @@ try
     {
         await Reject(() => new EmulatorProfiles(paths).PrepareAsync(Catalog.Get("gow3"), new() { UseLaunchProfile = true, Renderer = "Direct3D 11" }, new(), false, false));
     });
+    await Test("Volume-relative games outside the collection follow the current drive", async () =>
+    {
+        var stored = "@volume/OwnedGames/GodOfWarIII/PS3_GAME/USRDIR/EBOOT.BIN";
+        var resolved = paths.Resolve(stored);
+        Assert(resolved == Path.Combine(Path.GetPathRoot(paths.Root)!, "OwnedGames", "GodOfWarIII", "PS3_GAME", "USRDIR", "EBOOT.BIN"));
+        await Reject(() => Task.FromResult(paths.Resolve("@volume/../outside")));
+        await Reject(() => Task.FromResult(paths.Resolve("@volume/C:/outside")));
+        if (OperatingSystem.IsWindows())
+        {
+            var first = new CollectionPaths(@"X:\Collection");
+            var moved = new CollectionPaths(@"Y:\Collection");
+            Assert(first.Resolve(stored).StartsWith(@"X:\OwnedGames\") && moved.Resolve(stored).StartsWith(@"Y:\OwnedGames\"));
+        }
+    });
     if (args.Contains("--inventory"))
     {
         foreach (var path in args.SkipWhile(a => a != "--inventory").Skip(1))

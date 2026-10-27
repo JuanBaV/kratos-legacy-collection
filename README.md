@@ -19,7 +19,7 @@ Extract the complete portable build into a writable folder and run `KratosLegacy
 
 First-Time Setup saves progress after each step. Configure only the emulators you need, add your own files, import compatible enhancements and play. Setup can finish with no games or emulators. Reopen it from Settings whenever needed.
 
-Launcher data is stored in `Data` beside the executable when writable. A read-only application location falls back to `%LOCALAPPDATA%/KratosLegacyCollection`. For a separate private collection folder, start with `KratosLegacyCollection.exe --data-root "D:/MyCollection"`. Paths inside the collection are stored relatively, so moving the whole folder preserves them. External game and emulator paths remain external until explicitly copied.
+Launcher data is stored in `Data` beside the executable when writable. A read-only application location falls back to `%LOCALAPPDATA%/KratosLegacyCollection`. For a separate private collection folder, start with `KratosLegacyCollection.exe --data-root "D:/MyCollection"`. Paths inside the collection are stored relatively, so moving the whole folder preserves them. Existing files elsewhere on the same removable volume use `@volume/` paths anchored to its current drive root, allowing a drive-letter change without moving those files. Other external game and emulator paths remain external until explicitly copied.
 
 ## What works
 
