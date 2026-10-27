@@ -1,6 +1,6 @@
 # Publication checklist
 
-No remote, push or public release is configured by the development workflow. Publication requires the owner's explicit authorization.
+The owner has added a GitHub remote. The development workflow has performed no push or public release. Publication requires the owner's explicit authorization.
 
 Before each commit, run `scripts/Verify-Repository.ps1 -Staged`, inspect `git diff --cached --stat` and review each staged filename. The scanner is a useful guard, not a proof of licensing or absence of secrets. Inspect image contents separately. Keep private installation data and release builds outside Git.
 

@@ -28,7 +28,7 @@ Storage uses atomic JSON replacement with a preceding settings backup. Managed p
 
 ## Emulator and personal collection verification
 
-PCSX2 2.6.3 and PPSSPP 1.20.4 were found locally. RPCS3 0.0.43 was discovered; PS3 boot has not been tested with real content. Private SSD settings reference the four verified PS2/PSP images in their original locations. Existing texture directories and graphics/controller files remain there. They are not falsely registered as launcher-installed mods.
+PCSX2 2.6.3 and PPSSPP 1.20.4 were found locally. Private SSD settings reference four verified PS2/PSP images in their original locations. Existing texture directories and graphics/controller files remain there. They are not falsely registered as launcher-installed mods.
 
 Using isolated copies and the launch service, God of War (2005), Chains of Olympus and Ghost of Sparta reached their main menus. God of War II reached its initial display confirmation. The owner assisted with startup menus. This is boot evidence, not a full gameplay, controller or performance certification. The original PCSX2 INI and PPSSPP system/controller INI hashes remained unchanged.
 
@@ -36,12 +36,14 @@ A second, small PPSSPP copy tested a 2x temporary profile. Chains of Olympus rea
 
 Completed emulator test copies and helper builds were deleted. The full PPSSPP and PCSX2 clones alone recovered approximately 15.46 GB. Original games, saves, configurations, BIOS and texture directories were preserved. Private settings and extracted artwork remain outside the public repository.
 
-BIOCHIP is connected, but physical integration is deferred at the owner's request. No migration or writes to it were performed. Its remaining space was not measured in this acceptance pass. Its existing game folder and supercut are outside the application and repository.
+The owner subsequently authorized physical migration to removable storage. Copying and individual SHA-256 verification of the PS2/PSP games, portable emulator copies and their existing data is in progress. Original PC installations and collection files remain in place. Existing PS3 disc content and an unrelated movie remain outside the application folder and repository.
+
+God of War III BCES00510 was launched from its existing removable-drive folder using the owner's PC RPCS3 0.0.43 installation. The matching owner-provided European update was installed first; metadata and the boot log confirmed 01.03. The native custom configuration was loaded. After changing its exclusive-fullscreen option to Disable, a new boot reached the main menu with owner assistance. No global Windows HDR setting was changed. The game was closed after the boot check; prolonged gameplay and performance have not been certified. Details and limits are recorded in [Testing](TESTING.md).
 
 ## Verification results
 
 - Release build: success, zero warnings and zero errors.
-- Core regression suite: 49/49 cases passed using legal generated fixtures.
+- Core regression suite: 50/50 cases passed using legal generated fixtures, including collection-relative and removable-volume drive changes.
 - WPF suite: 78 distinct assertions passed; repeated command-availability assertions are excluded from this count. Three rendered sizes, navigation and command routes, binding diagnostics, sorting and artwork decoding were checked.
 - Self-contained package: started natively; welcome, five-step setup, empty library, sorting and native executable-picker opening/cancellation were exercised. Duplicate collection opening produces an English error.
 - Native dialogs and external services are injected boundaries in automated tests; no claim is made that every OS dialog or third-party emulator feature was manually exercised.
@@ -49,7 +51,7 @@ BIOCHIP is connected, but physical integration is deferred at the owner's reques
 
 ## Remaining acceptance and limits
 
-Real God of War III / Ascension boot, full gameplay, actual performance, controller calibration, per-monitor DPI changes, another PC and physical USB disconnection/reconnection remain manual acceptance items. The launcher does not promise Ultra HD performance on arbitrary hardware.
+Ascension boot, full gameplay, actual performance, controller acceptance, per-monitor DPI changes, another PC and physical USB disconnection/reconnection remain manual acceptance items. The ongoing PS2/PSP transfer still requires final verification and launch checks. The launcher does not promise Ultra HD performance on arbitrary hardware.
 
 No authorized Modder Espartano archive was obtained or inspected. The creator channel, original God of War II publication and public Discord invitation were verified, but exact pack versions, regions, archive layouts and redistribution permissions remain unestablished. No invented package catalog or unverified patch code is shipped. 7Z extraction is not implemented; ZIP is explicitly supported. Native game widescreen and output stretching are distinguished.
 
@@ -64,11 +66,13 @@ On Windows with the .NET 10 SDK:
 
 Keep the complete published folder together. A clean copy opens setup. The owner's separate local shortcut supplies a private collection root; private paths are never part of public defaults. See the [README](../README.md) for manual build commands and data-location behavior.
 
-The local repository uses branch `main`, with no remote or push. Incremental commits include:
+The local repository uses branch `main`. The owner added a GitHub remote; the development workflow has performed no push or public release. Incremental commits include:
 
 - `61809ef` feat: initialize launcher, independent library and enhancement services
 - `ba97a51` feat: add safe artwork extraction, graphics profiles and patch compatibility
 - `3bc5b87` feat: refine library controls and verify portable workflows
 - `344d66d` fix: show only supported per-game graphics controls
+- `8b5f7d9` docs: prepare local release candidate and verification evidence
+- `7c3f3b8` feat: preserve removable-volume game paths across drive changes
 
 Documentation and verification are committed separately. Branch names and commit messages have no agent suffix. Staged filenames and content were scanned before commits; public screenshots contain original presentation only. Source is MIT licensed, and README/About contain the non-affiliation notice. The Windows CI workflow is prepared but has not run remotely. No public release, GitHub push or trademark clearance is claimed. Review naming and third-party rights before authorizing publication.

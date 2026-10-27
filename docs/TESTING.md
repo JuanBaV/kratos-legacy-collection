@@ -6,7 +6,7 @@ The core suite uses generated ISO9660 directories, PARAM.SFO records, tiny PNGs,
 
 WPF checks instantiate the real application resources and window on an STA dispatcher, exercise view-model command routes, render the interface at 900x650, 1280x860 and 1600x900, inspect binding diagnostics and validate logical focus. File dialogs, external browser launches and confirmation answers are injected test boundaries. These checks are not a claim that every native Windows dialog was manually clicked.
 
-The final local run on 2026-10-27 passed 49/49 core cases and 78 distinct WPF assertions, excluding repeated command-availability checks. Release compilation completed with zero warnings and zero errors. The self-contained Windows x64 folder was published locally; no GitHub workflow was run remotely.
+The latest local run on 2026-10-27 passed 50/50 core cases and 78 distinct WPF assertions, excluding repeated command-availability checks. Release compilation completed with zero warnings and zero errors. The self-contained Windows x64 folder was published locally; no GitHub workflow was run remotely.
 
 ## Acceptance matrix
 
@@ -20,7 +20,7 @@ The final local run on 2026-10-27 passed 49/49 core cases and 78 distinct WPF as
 | Single-game library | Readiness remains independent. | Boot the owned game with the real emulator. |
 | All game launch adapters | Six separate argument plans, shell-free process transport and spaces preserved. | Real boot and gameplay for each owned release. |
 | Wrong game or incompatible image | Invalid ISO/SFO bounds, mismatched IDs, invalid compressed headers. | Modified or less-common regional dumps need review. |
-| Drive-letter change | Relative paths resolve against a simulated moved root. | Physical USB reconnection on another letter and PC. |
+| Drive-letter change | Collection-relative and removable-volume paths resolve against simulated moved roots; unsafe volume paths are rejected. | Physical USB reconnection on another letter and PC. |
 | Valid textures | PCSX2 serial/replacements and both PPSSPP layouts. | Check visual replacements in the emulator. |
 | Incompatible textures | Wrong IDs, ambiguous layouts, scripts, unsafe paths and expansion limits rejected. | Author-specific archives require their actual instructions. |
 | Enable/disable/uninstall | Existing files backed up; overlapping mods and external edits rejected. | Crash/disconnect recovery on removable storage. |
@@ -45,4 +45,8 @@ A separate minimal PPSSPP 1.20.4 copy tested the temporary launch profile with `
 
 A copied PCSX2 2.6.3 installation with copied user data and a private copy of the owner's BIOS booted God of War (2005) to its main menu. God of War II reached its initial display-settings confirmation. The owner assisted with emulator/game startup menus. The original PCSX2 INI SHA-256 remained unchanged. The temporary PCSX2 tree was removed after verification, recovering 11,863,354,427 bytes.
 
-God of War III and Ascension require separate real-content acceptance. Physical BIOCHIP integration is deferred by the owner. No public screenshot or test fixture includes personal or commercial game content.
+God of War III (BCES00510) booted from its existing removable-drive disc folder through the launch service and the owner's PC installation of RPCS3 0.0.43. The owner-provided European update was installed first; installed metadata and the boot log confirmed version 01.03. The log also confirmed the owner's native custom configuration. The owner assisted with brightness calibration and confirmed the main menu. No RPCS3 copy is required on the removable drive.
+
+At the owner's request, only the custom profile's Vulkan `Exclusive Fullscreen Mode` was changed from `Automatic` to `Disable` before restarting. The next boot log confirmed that value and `VK_FULL_SCREEN_EXCLUSIVE_DISALLOWED_EXT`. Windows HDR settings were not changed. Controller configuration was performed by the owner afterward and is not an automated test result.
+
+The copy and verification of the PS2/PSP collection to removable storage is in progress. Its final launch checks, physical drive-letter changes, another PC and extended gameplay remain acceptance items. Ascension has no user-provided game files and has not been booted. No public screenshot or test fixture includes personal or commercial game content.
