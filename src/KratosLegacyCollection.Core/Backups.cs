@@ -50,7 +50,7 @@ public sealed class PortablePreparation(CollectionPaths paths)
                 var data = paths.Resolve(emulator.DataDirectory);
                 if (Directory.Exists(data) && !data.Equals(binaryRoot, StringComparison.OrdinalIgnoreCase)) {
                     var target = kind == EmulatorKind.PPSSPP ? Path.Combine(staging, "memstick") : staging;
-                    var files = StorageOperations.EnumerateSafe(data, 64, token).ToArray();
+                    var files = StorageOperations.CopyFiles(data, token);
                     StorageOperations.RequireSpace(staging, files.Sum(f => new FileInfo(f).Length));
                     foreach (var file in files) {
                         token.ThrowIfCancellationRequested();

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 namespace KratosLegacyCollection.Core;
 
 public sealed record PackInspection(string Archive, string GameId, string Prefix, string Profile, long ExpandedBytes, int FileCount);
+public sealed record PatchDescriptor(string GameId, string Revision, string MinEmulatorVersion, string MaxEmulatorVersion, string Sha256, string Source, string Author);
 
 public sealed partial class TexturePackInspector
 {
@@ -63,7 +64,21 @@ public sealed class EnhancementManager(CollectionPaths paths)
     private string RecordPath(string id) => CollectionPaths.SafeCombine(Store, id + "/manifest.json");
     public IReadOnlyList<InstalledEnhancement> Load() {
         if (!Directory.Exists(Store)) return [];
-        return Directory.GetFiles(Store, "manifest.json", SearchOption.AllDirectories).Select(f => JsonSerializer.Deserialize<InstalledEnhancement>(File.ReadAllText(f), SettingsStore.Json) ?? throw new UserError("An enhancement record is damaged.")).ToArray();
+        var records = new List<InstalledEnhancement>();
+        foreach (var folder in Directory.GetDirectories(Store)) {
+            CollectionPaths.AssertNoLinks(Store, folder);
+            var file = Path.Combine(folder, "manifest.json"); if (!File.Exists(file)) continue;
+            CollectionPaths.AssertNoLinks(Store, file);
+            if (new FileInfo(file).Length > 32_000_000) throw new UserError("An enhancement record exceeds the safety limit.");
+            var mod = JsonSerializer.Deserialize<InstalledEnhancement>(File.ReadAllText(file), SettingsStore.Json) ?? throw new UserError("An enhancement record is damaged.");
+            if (!Guid.TryParseExact(mod.Id, "N", out _) || mod.Id != Path.GetFileName(folder) || paths.Resolve(mod.PayloadDirectory) != Path.Combine(folder, "payload")) throw new UserError("An enhancement record points outside its managed folder.");
+            foreach (var owned in mod.Files) {
+                CollectionPaths.SafeCombine(paths.Resolve(mod.TargetDirectory), owned.RelativePath);
+                if (owned.BackupPath != null && !CollectionPaths.IsWithin(Path.Combine(folder, "backup"), paths.Resolve(owned.BackupPath))) throw new UserError("An enhancement backup path is invalid.");
+            }
+            records.Add(mod);
+        }
+        return records;
     }
     private async Task SaveAsync(InstalledEnhancement mod) {
         var file = RecordPath(mod.Id); Directory.CreateDirectory(Path.GetDirectoryName(file)!);
@@ -90,30 +105,45 @@ public sealed class EnhancementManager(CollectionPaths paths)
             await SaveAsync(mod); return mod;
         } catch { if (Directory.Exists(Path.GetDirectoryName(payload)!)) Directory.Delete(Path.GetDirectoryName(payload)!, true); throw; }
     }
-    public async Task<InstalledEnhancement> ImportPatchAsync(string file, GameDefinition definition, GameSettings game, string target, EnhancementKind kind, CancellationToken token = default) {
-        if (!game.IdentityConfirmed || game.GameId == null) throw new UserError("Verify the game identity before importing a patch.");
+    public async Task<InstalledEnhancement> ImportPatchAsync(string file, GameDefinition definition, GameSettings game, string target, EnhancementKind kind, CancellationToken token = default, string? emulatorVersion = null) {
+        if (!game.IdentityConfirmed || game.GameId == null || !definition.GameIds.Contains(game.GameId)) throw new UserError("Verify the game identity before importing a patch.");
         if (new FileInfo(file).Length > 2_000_000) throw new UserError("The patch exceeds the 2 MB safety limit.");
         var text = await File.ReadAllTextAsync(file, token);
         string targetName;
+        PatchDescriptor? descriptor = null;
         if (definition.Emulator == EmulatorKind.PCSX2) {
             if (game.Crc == null || !Regex.IsMatch(game.Crc, "^[0-9A-Fa-f]{8}$")) throw new UserError("Enter the exact ELF CRC reported by PCSX2 first. ISO file hashes are not ELF CRCs.");
-            if (!Path.GetExtension(file).Equals(".pnach", StringComparison.OrdinalIgnoreCase) || !Path.GetFileName(file).Contains(game.Crc, StringComparison.OrdinalIgnoreCase)) throw new UserError("The PNACH filename must contain this game's exact ELF CRC.");
+            if (!Path.GetExtension(file).Equals(".pnach", StringComparison.OrdinalIgnoreCase) || !Path.GetFileName(file).Contains(game.Crc, StringComparison.OrdinalIgnoreCase) || !Catalog.NormalizeId(Path.GetFileNameWithoutExtension(file)).StartsWith(game.GameId, StringComparison.Ordinal)) throw new UserError("The PNACH filename must contain this game's exact serial and ELF CRC.");
             targetName = Path.GetFileName(file);
         } else if (definition.Emulator == EmulatorKind.PPSSPP) {
             if (!Path.GetExtension(file).Equals(".ini", StringComparison.OrdinalIgnoreCase) || !Regex.IsMatch(text, @"(?m)^_S\s+" + Regex.Escape(game.GameId.Insert(4, "-")) + @"\s*$", RegexOptions.IgnoreCase)) throw new UserError("The cheat file's _S Game ID must exactly match this game.");
+            var metadata = file + ".klc.json";
+            if (!File.Exists(metadata) || new FileInfo(metadata).Length > 65536) throw new UserError("A PSP patch requires a .ini.klc.json compatibility descriptor with its exact revision, emulator range, source and SHA-256. See docs/ENHANCEMENTS.md.");
+            descriptor = JsonSerializer.Deserialize<PatchDescriptor>(await File.ReadAllTextAsync(metadata, token), SettingsStore.Json) ?? throw new UserError("The patch compatibility descriptor is invalid.");
+            if (descriptor.GameId != game.GameId || descriptor.Revision != game.Revision || !descriptor.Sha256.Equals(StorageOperations.Hash(file), StringComparison.OrdinalIgnoreCase) || !Uri.TryCreate(descriptor.Source, UriKind.Absolute, out var source) || source.Scheme != "https") throw new UserError("The patch descriptor does not match this exact game revision and file.");
+            if (!VersionMatches(emulatorVersion, descriptor.MinEmulatorVersion, descriptor.MaxEmulatorVersion)) throw new UserError("The selected emulator version is outside this patch's documented compatibility range.");
             targetName = game.GameId + ".ini";
         } else throw new UserError("Use RPCS3's native Manage > Game Patches dialog. It validates PPU hashes and game versions. No unverified RPCS3 patch is applied by the launcher.");
         if (string.IsNullOrWhiteSpace(game.Revision) && definition.Emulator == EmulatorKind.PPSSPP) throw new UserError("Confirm the game revision before importing a PSP patch.");
         var mod = new InstalledEnhancement { GameKey = definition.Key, GameId = game.GameId, Name = Path.GetFileNameWithoutExtension(file), Kind = kind, Version = game.Revision ?? game.Crc!, TargetDirectory = paths.Store(target) };
+        if (definition.Emulator == EmulatorKind.PCSX2) mod.Version = game.Crc!;
+        if (descriptor != null) { mod.MinEmulatorVersion = descriptor.MinEmulatorVersion; mod.MaxEmulatorVersion = descriptor.MaxEmulatorVersion; mod.Page = descriptor.Source; mod.Author = descriptor.Author; }
         var payload = CollectionPaths.SafeCombine(Store, mod.Id + "/payload"); Directory.CreateDirectory(payload);
         mod.PayloadDirectory = paths.Store(payload);
         await StorageOperations.CopyVerifiedAsync(file, CollectionPaths.SafeCombine(payload, targetName), token: token);
         await SaveAsync(mod); return mod;
     }
+    public static bool VersionMatches(string? current, string min, string max) => Version.TryParse(current?.TrimStart('v'), out var actual) && Version.TryParse(min, out var lower) && Version.TryParse(max, out var upper) && actual >= lower && actual <= upper;
+    public static void RequireCompatible(InstalledEnhancement mod, GameDefinition definition, GameSettings game, EmulatorSettings emulator) {
+        if (!game.IdentityConfirmed || mod.GameKey != definition.Key || mod.GameId != game.GameId) throw new UserError("An enabled enhancement does not match this game's identity. Disable it before changing game versions.");
+        if (mod.Kind == EnhancementKind.Textures) return;
+        if (mod.Version != (definition.Emulator == EmulatorKind.PCSX2 ? game.Crc : game.Revision)) throw new UserError("This patch belongs to a different game revision or ELF CRC. Disable it and import a matching patch.");
+        if (mod.MinEmulatorVersion != null && !VersionMatches(emulator.Version, mod.MinEmulatorVersion, mod.MaxEmulatorVersion ?? "")) throw new UserError("This patch does not support the selected emulator version.");
+    }
     public async Task EnableAsync(InstalledEnhancement mod, bool allowOverwrite, CancellationToken token = default) {
         if (mod.Enabled) throw new UserError("This enhancement is already enabled.");
         var target = paths.Resolve(mod.TargetDirectory); var payload = paths.Resolve(mod.PayloadDirectory);
-        var sourceFiles = StorageOperations.EnumerateSafe(payload, 64, token).ToArray();
+        var sourceFiles = StorageOperations.CopyFiles(payload, token);
         if (sourceFiles.Length == 0) throw new UserError("The stored payload is missing.");
         var active = Load().Where(m => m.Enabled && m.Id != mod.Id).ToArray();
         var owned = new List<OwnedFile>(); long size = 0;
@@ -151,6 +181,7 @@ public sealed class EnhancementManager(CollectionPaths paths)
         var target = paths.Resolve(mod.TargetDirectory);
         foreach (var file in mod.Files) {
             var destination = CollectionPaths.SafeCombine(target, file.RelativePath);
+            if (file.BackupPath != null && !File.Exists(paths.Resolve(file.BackupPath))) throw new UserError("A backup is missing. The enhancement remains registered for recovery.");
             if (File.Exists(destination) && StorageOperations.Hash(destination) != file.Hash) {
                 if (file.BackupPath != null && File.Exists(paths.Resolve(file.BackupPath)) && StorageOperations.Hash(destination) == StorageOperations.Hash(paths.Resolve(file.BackupPath))) continue;
                 throw new UserError("An installed file changed outside the launcher. It was preserved. Resolve the conflict before restoring this enhancement.");

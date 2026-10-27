@@ -38,7 +38,9 @@ public sealed class LaunchService(CollectionPaths paths)
                 var disc = Directory.Exists(Path.Combine(game, "PS3_GAME")) ? Path.Combine(game, "PS3_GAME") : game;
                 var boot = Path.Combine(disc, "USRDIR", "EBOOT.BIN");
                 if (!File.Exists(boot)) throw new UserError("The PS3 boot file was not found.");
-                arguments.Add("--no-gui"); arguments.Add(boot); break;
+                arguments.Add("--no-gui"); if (state.Fullscreen) arguments.Add("--fullscreen");
+                if (profile != null) { arguments.Add("--config"); arguments.Add(profile); }
+                arguments.Add(boot); break;
         }
         return new(executable, Path.GetDirectoryName(executable)!, arguments);
     }
@@ -57,11 +59,12 @@ public static class GraphicsProfiles
 {
     public static void Select(GameSettings game, GraphicsPreset preset) {
         game.Preset = preset;
+        game.UseLaunchProfile = true;
         if (preset != GraphicsPreset.Custom) { game.ResolutionScale = preset switch { GraphicsPreset.Original => 1, GraphicsPreset.Enhanced => 3, _ => 6 }; game.Renderer = "Default"; }
     }
     public static string PspOverlay(GameSettings game, bool textures) {
         if (game.ResolutionScale is < 1 or > 10) throw new UserError("Resolution scale must be between 1 and 10.");
         var backend = game.Renderer switch { "Vulkan" => "\nGraphicsBackend = 3", "Direct3D 11" => "\nGraphicsBackend = 2", "OpenGL" => "\nGraphicsBackend = 0", _ => "" };
-        return $"[Graphics]\nInternalResolution = {game.ResolutionScale}{(textures ? "\nReplaceTextures = True" : "")}{backend}\n";
+        return $"[Graphics]\n{(game.UseLaunchProfile ? "InternalResolution = " + game.ResolutionScale + backend : "")}{(textures ? "\nReplaceTextures = True" : "")}\n";
     }
 }

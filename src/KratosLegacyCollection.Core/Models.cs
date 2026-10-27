@@ -67,12 +67,16 @@ public sealed class EmulatorSettings
 
 public sealed class GameSettings
 {
+    public string? ArtworkPath { get; set; }
+    public string? ArtworkSource { get; set; }
+    public string? ArtworkCredit { get; set; }
     public string? Path { get; set; }
     public string? GameId { get; set; }
     public string? Revision { get; set; }
     public string? Crc { get; set; }
     public bool IdentityConfirmed { get; set; }
     public GraphicsPreset Preset { get; set; } = GraphicsPreset.Original;
+    public bool UseLaunchProfile { get; set; }
     public int ResolutionScale { get; set; } = 1;
     public string Renderer { get; set; } = "Default";
     public bool Widescreen { get; set; }
@@ -86,6 +90,8 @@ public sealed class InstalledEnhancement
     public string Name { get; set; } = "";
     public string Author { get; set; } = "User supplied";
     public string Version { get; set; } = "Unspecified";
+    public string? MinEmulatorVersion { get; set; }
+    public string? MaxEmulatorVersion { get; set; }
     public string? Page { get; set; }
     public EnhancementKind Kind { get; set; }
     public string PayloadDirectory { get; set; } = "";

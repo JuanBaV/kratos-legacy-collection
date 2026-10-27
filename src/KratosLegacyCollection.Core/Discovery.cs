@@ -34,6 +34,14 @@ public sealed class EmulatorDiscovery
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         foreach (var root in new[] { Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), Path.Combine(home, "Downloads"), Path.Combine(home, "Desktop"), Path.Combine(documents, "Emulators"), Path.Combine(home, "Games"), @"C:\Emulators", @"C:\Games" })
             if (Directory.Exists(root)) yield return root;
+        foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.DriveType == DriveType.Fixed)) {
+            string[] folders;
+            try { folders = Directory.GetDirectories(drive.RootDirectory.FullName); } catch (IOException) { continue; } catch (UnauthorizedAccessException) { continue; }
+            foreach (var folder in folders) {
+                var name = Path.GetFileName(folder);
+                if (name.Contains("rpcs3", StringComparison.OrdinalIgnoreCase) || name.Contains("pcsx2", StringComparison.OrdinalIgnoreCase) || name.Contains("ppsspp", StringComparison.OrdinalIgnoreCase) || name.Equals("Emulators", StringComparison.OrdinalIgnoreCase)) yield return folder;
+            }
+        }
     }
     public Task<IReadOnlyList<EmulatorCandidate>> FindAsync(IEnumerable<string> roots, IProgress<string>? progress = null, CancellationToken token = default) => Task.Run<IReadOnlyList<EmulatorCandidate>>(() => {
         var found = new Dictionary<string, EmulatorCandidate>(StringComparer.OrdinalIgnoreCase);
@@ -46,7 +54,7 @@ public sealed class EmulatorDiscovery
                 }
             }
         }
-        return found.Values.ToArray();
+        return found.Values.OrderBy(c => Array.IndexOf(Names[c.Kind], Path.GetFileName(c.Executable))).ToArray();
     }, token);
 }
 

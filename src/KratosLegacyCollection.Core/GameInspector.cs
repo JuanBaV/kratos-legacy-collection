@@ -6,6 +6,28 @@ namespace KratosLegacyCollection.Core;
 
 public sealed partial class GameInspector
 {
+    public Task<byte[]?> ReadArtworkAsync(string path, CancellationToken token = default) => Task.Run(() => {
+        token.ThrowIfCancellationRequested();
+        if (Directory.Exists(path)) {
+            var folder = Directory.Exists(Path.Combine(path, "PS3_GAME")) ? Path.Combine(path, "PS3_GAME") : path;
+            foreach (var name in new[] { "PIC1.PNG", "ICON0.PNG" }) {
+                var file = Path.Combine(folder, name);
+                if (File.Exists(file) && new FileInfo(file).Length is > 0 and <= ArtworkService.MaxBytes) return File.ReadAllBytes(file);
+            }
+            return null;
+        }
+        if (!File.Exists(path) || !Path.GetExtension(path).Equals(".iso", StringComparison.OrdinalIgnoreCase)) return null;
+        using var stream = File.OpenRead(path);
+        if (stream.Length < 17 * 2048) return null;
+        var pvd = ReadAt(stream, 16 * 2048, 2048);
+        if (pvd[0] != 1 || Encoding.ASCII.GetString(pvd, 1, 5) != "CD001") return null;
+        var psp = FindRecord(stream, DirectoryRecord(pvd, 156), "PSP_GAME"); if (psp == null) return null;
+        foreach (var name in new[] { "PIC1.PNG", "ICON0.PNG" }) {
+            var entry = FindRecord(stream, psp.Value, name);
+            if (entry is { size: > 0 and <= ArtworkService.MaxBytes }) return ReadAt(stream, entry.Value.extent * 2048L, (int)entry.Value.size);
+        }
+        return null;
+    }, token);
     public Task<GameInspection> InspectAsync(string path, CancellationToken token = default) => Task.Run(() => Inspect(path, token), token);
     private static GameInspection Inspect(string path, CancellationToken token) {
         token.ThrowIfCancellationRequested();

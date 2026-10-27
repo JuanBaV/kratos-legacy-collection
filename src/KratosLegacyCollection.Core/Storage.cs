@@ -55,10 +55,12 @@ public sealed class SettingsStore(CollectionPaths paths)
             foreach (var kind in Enum.GetValues<EmulatorKind>()) state.Emulators.TryAdd(kind, new());
             foreach (var game in Catalog.Games) state.Games.TryAdd(game.Key, new());
             state.SetupStep = Math.Clamp(state.SetupStep, 0, 4);
+            Validate(state);
             return state;
         } catch (JsonException) { throw new UserError("Settings could not be read. The original file was preserved. Restore settings.json.bak from Data or select another data folder."); }
     }
     public async Task SaveAsync(LauncherSettings settings, CancellationToken token = default) {
+        Validate(settings);
         Directory.CreateDirectory(paths.Data);
         CollectionPaths.AssertNoLinks(paths.Root, paths.Data);
         var temp = FilePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
@@ -71,6 +73,17 @@ public sealed class SettingsStore(CollectionPaths paths)
             if (File.Exists(FilePath)) File.Replace(temp, FilePath, FilePath + ".bak");
             else File.Move(temp, FilePath);
         } finally { if (File.Exists(temp)) File.Delete(temp); }
+    }
+    private void Validate(LauncherSettings settings) {
+        if (settings.Games == null || settings.Emulators == null || settings.Games.Values.Any(g => g == null) || settings.Emulators.Values.Any(e => e == null)) throw new UserError("The configuration contains an invalid game or emulator entry.");
+        foreach (var game in settings.Games.Values) {
+            if (game.ResolutionScale is < 1 or > 10) throw new UserError("Resolution scale must be between 1 and 10.");
+            if (!string.IsNullOrWhiteSpace(game.Path)) paths.Resolve(game.Path);
+        }
+        foreach (var emulator in settings.Emulators.Values) {
+            if (!string.IsNullOrWhiteSpace(emulator.Executable)) paths.Resolve(emulator.Executable);
+            if (!string.IsNullOrWhiteSpace(emulator.DataDirectory)) paths.Resolve(emulator.DataDirectory);
+        }
     }
 }
 
@@ -97,8 +110,6 @@ public static class StorageOperations
         if (!drive.IsReady) throw new UserError("The destination drive is disconnected.");
         if (bytes < 0 || drive.AvailableFreeSpace < bytes + 32L * 1024 * 1024)
             throw new UserError("There is not enough free space. Choose another destination. No existing files were removed.");
-        if (drive.DriveFormat.Equals("FAT32", StringComparison.OrdinalIgnoreCase) && bytes > uint.MaxValue)
-            throw new UserError("This transfer may exceed the FAT32 file-size limit. Use an existing exFAT or NTFS destination.");
     }
     public static string Hash(string file) {
         using var stream = File.OpenRead(file);
@@ -124,17 +135,35 @@ public static class StorageOperations
     private static readonly HashSet<string> Excluded = new(StringComparer.OrdinalIgnoreCase) {
         "Windows", "WindowsApps", "$Recycle.Bin", "System Volume Information", ".git", "node_modules", "obj", "bin", "cache", "Cache", "shadercache", "dev_flash", "dev_hdd0", "WpSystem", ".codex"
     };
+    public static string[] CopyFiles(string root, CancellationToken token = default) {
+        var files = new List<string>(); var folders = new Stack<string>(); folders.Push(root);
+        while (folders.TryPop(out var folder)) {
+            token.ThrowIfCancellationRequested();
+            CollectionPaths.AssertNoLinks(root, folder);
+            foreach (var entry in Directory.EnumerateFileSystemEntries(folder)) {
+                token.ThrowIfCancellationRequested();
+                var attributes = File.GetAttributes(entry);
+                if ((attributes & FileAttributes.ReparsePoint) != 0) throw new UserError("A copy source contains a link or online-only placeholder. Make all source files locally available and use a folder without junctions.");
+                if ((attributes & FileAttributes.Directory) != 0) folders.Push(entry); else files.Add(entry);
+            }
+        }
+        return files.ToArray();
+    }
     public static async Task<string> CopyVerifiedAsync(string source, string destination, IProgress<string>? progress = null, CancellationToken token = default) {
         source = Path.GetFullPath(source); destination = Path.GetFullPath(destination);
         if (File.Exists(destination) || Directory.Exists(destination)) throw new UserError("The destination already exists. Choose a new folder or filename.");
         if (CollectionPaths.IsWithin(source, destination) || source.Equals(destination, StringComparison.OrdinalIgnoreCase)) throw new UserError("The destination cannot be inside the source.");
         CollectionPaths.AssertNoLinks(Path.GetPathRoot(source)!, source);
         var isDirectory = Directory.Exists(source);
-        var files = isDirectory ? EnumerateSafe(source, 64, token).ToArray() : File.Exists(source) ? [source] : throw new UserError("The source is no longer available.");
+        var files = isDirectory ? CopyFiles(source, token) : File.Exists(source) ? [source] : throw new UserError("The source is no longer available.");
         long size = files.Sum(f => new FileInfo(f).Length);
         RequireSpace(destination, size);
+        var destinationDrive = new DriveInfo(Path.GetPathRoot(destination)!);
+        if (destinationDrive.DriveFormat.Equals("FAT32", StringComparison.OrdinalIgnoreCase) && files.Any(f => new FileInfo(f).Length > uint.MaxValue))
+            throw new UserError("A source file exceeds FAT32's 4 GB file limit. Choose an existing exFAT or NTFS destination.");
         var staging = destination + ".copy-" + Guid.NewGuid().ToString("N");
         try {
+            if (isDirectory) Directory.CreateDirectory(staging);
             foreach (var file in files) {
                 token.ThrowIfCancellationRequested();
                 var target = isDirectory ? CollectionPaths.SafeCombine(staging, Path.GetRelativePath(source, file)) : staging;
